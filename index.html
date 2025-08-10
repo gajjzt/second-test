@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Color Illusion Test</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #eaeaea;
+      color: #2b4d3a;
+      text-align: center;
+      padding: 40px;
+    }
+    h1 {
+      font-size: 32px;
+      margin-bottom: 20px;
+    }
+    h2 {
+      margin-top: 40px;
+      font-size: 24px;
+    }
+    .test-section {
+      background-color: #d8f3dc;
+      padding: 20px;
+      margin: 30px auto;
+      width: 80%;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .circles {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 80px;
+      margin: 30px 0;
+    }
+    .circle {
+      border-radius: 50%;
+    }
+    .adjustable {
+      background-color: black;
+      width: 100px;
+      height: 100px;
+      transition: width 0.3s ease, height 0.3s ease;
+    }
+    .fixed-black {
+      background-color: black;
+      border-radius: 50%;
+    }
+    .fixed-white {
+      background-color: white;
+      border-radius: 50%;
+      border: none; /* 去掉灰色边框 */
+    }
+    input[type="range"] {
+      width: 300px;
+    }
+    button {
+      padding: 8px 20px;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 6px;
+      background-color: #40916c;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin: 8px;
+    }
+    button:hover:not(:disabled) {
+      background-color: #2d6a4f;
+    }
+    button:disabled {
+      background-color: #aaa;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Color Illusion Test</h1>
+
+  <div id="test-container"></div>
+
+  <script>
+    const googleFormURL = "https://docs.google.com/forms/d/e/1FAIpQLScZXWXY2F85EuRsUvEI6Nz7oSfWKwhYmoIkrcFtswZWs-oTyg/formResponse";
+    const entryIDs = {
+      task1: "entry.1687191309",
+      task2: "entry.1375215153",
+      task3: "entry.1509402438",
+      task4: "entry.1955027143",
+      task5: "entry.1920918842",
+      task6: "entry.990821561",
+      task7: "entry.347951627",
+      task8: "entry.588110422",
+      task9: "entry.1986465218",
+      task10: "entry.849888943"
+    };
+
+    const diameters = [170, 90, 130, 190, 110];
+    const tasks = [];
+    diameters.forEach(d => {
+      tasks.push({diameter: d, type: "black"});
+      tasks.push({diameter: d, type: "white"});
+    });
+
+    const container = document.getElementById("test-container");
+
+    tasks.forEach((task, index) => {
+      const taskNumber = index + 1;
+
+      const section = document.createElement("div");
+      section.className = "test-section";
+
+      const title = document.createElement("h2");
+      title.textContent = `Task ${taskNumber}: Black Circle vs. ${task.type === "black" ? "Black" : "White"} Circle`;
+      section.appendChild(title);
+
+      const circlesDiv = document.createElement("div");
+      circlesDiv.className = "circles";
+
+      const adjCircle = document.createElement("div");
+      adjCircle.className = "circle adjustable";
+      adjCircle.style.width = "100px";
+      adjCircle.style.height = "100px";
+
+      const fixedCircle = document.createElement("div");
+      fixedCircle.className = `circle fixed-${task.type}`;
+      fixedCircle.style.width = task.diameter + "px";
+      fixedCircle.style.height = task.diameter + "px";
+
+      circlesDiv.appendChild(adjCircle);
+      circlesDiv.appendChild(fixedCircle);
+      section.appendChild(circlesDiv);
+
+      const slider = document.createElement("input");
+      slider.type = "range";
+      slider.min = 50;
+      slider.max = 250;
+      slider.value = 100;
+      slider.addEventListener("input", e => {
+        adjCircle.style.width = e.target.value + "px";
+        adjCircle.style.height = e.target.value + "px";
+      });
+      section.appendChild(slider);
+
+      const p = document.createElement("p");
+      p.textContent = "Adjust the slider until both circles appear to be the same size.";
+      section.appendChild(p);
+
+      const btn = document.createElement("button");
+      btn.textContent = "Submit";
+      btn.addEventListener("click", () => {
+        btn.disabled = true;
+        slider.disabled = true;
+        alert(`Task ${taskNumber} submitted!`);
+        const formData = new FormData();
+        formData.append(entryIDs[`task${taskNumber}`], slider.value);
+        fetch(googleFormURL, {
+          method: "POST",
+          mode: "no-cors",
+          body: formData
+        });
+      });
+      section.appendChild(btn);
+
+      container.appendChild(section);
+    });
+  </script>
+
+</body>
+</html>
